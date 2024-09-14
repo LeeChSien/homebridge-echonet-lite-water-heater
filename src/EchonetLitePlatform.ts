@@ -8,8 +8,10 @@ import type {
   Service,
 } from 'homebridge'
 
-import { WaterHeaterAccessory } from './WaterHeaterAccessory.js'
-import { FloorHeaterAccessory } from './FlooerHeaterAccessory.js'
+import { BathAutoAccessory } from './BathAutoAccessory.js'
+import { BathReheatingAccessory } from './BathReheatingAccessory.js'
+import { FloorHeater1Accessory } from './FlooerHeater1Accessory.js'
+import { FloorHeater2Accessory } from './FlooerHeater2Accessory.js'
 
 export class EchonetLitePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service
@@ -39,18 +41,32 @@ export class EchonetLitePlatform implements DynamicPlatformPlugin {
   }
 
   async discoverDevices() {
-    const waterHeaterAccessory = new WaterHeaterAccessory(this, this.config)
+    const bathAutoAccessory = new BathAutoAccessory(this, this.config)
     try {
-      await waterHeaterAccessory.init()
+      await bathAutoAccessory.init()
     } catch (e) {
-      this.log.error('Cannot init water heater')
+      this.log.error('Cannot init bath auto')
     }
 
-    const flooerHeaterAccessory = new FloorHeaterAccessory(this, this.config)
+    const bathReheatingAccessory = new BathReheatingAccessory(this, this.config)
     try {
-      await flooerHeaterAccessory.init()
+      await bathReheatingAccessory.init()
     } catch (e) {
-      this.log.error('Cannot init water heater')
+      this.log.error('Cannot init bath reheating')
+    }
+
+    const flooerHeater1Accessory = new FloorHeater1Accessory(this, this.config)
+    try {
+      await flooerHeater1Accessory.init()
+    } catch (e) {
+      this.log.error('Cannot init floor heater 1')
+    }
+
+    const flooerHeater2Accessory = new FloorHeater2Accessory(this, this.config)
+    try {
+      await flooerHeater2Accessory.init()
+    } catch (e) {
+      this.log.error('Cannot init floor heater 2')
     }
   }
 }

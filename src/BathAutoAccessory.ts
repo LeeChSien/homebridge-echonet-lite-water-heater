@@ -4,25 +4,19 @@ import type { EchonetLitePlatform } from './EchonetLitePlatform.js'
 import { sendSet, sendGet, subscribe } from './EchonetLiteService.js'
 import { PLATFORM_NAME } from './settings.js'
 
-enum Power {
-  ON = 'ON',
-  OFF = 'OFF',
+enum Switch {
+  Active = 'Active',
+  Inactive = 'Inactive',
 }
 
-const FIXED_ID = 'fixed:echonet-lite:water-heater'
+const FIXED_ID = 'fixed:echonet-lite:bath-auto'
 const ECHONET_LITE_ID = '027201'
 
-export class WaterHeaterAccessory {
+export class BathAutoAccessory {
   public accessory!: PlatformAccessory
-
-  private autoService!: Service
-  private autoState = {
-    power: Power.OFF as Power,
-  }
-
-  private reheatingService!: Service
-  private reheatingState = {
-    power: Power.OFF as Power,
+  private service!: Service
+  private state = {
+    switch: Switch.Active as Switch,
   }
 
   constructor(
@@ -47,7 +41,7 @@ export class WaterHeaterAccessory {
       )
       this.accessory.context.device = this.configs
       this.platform.api.registerPlatformAccessories(
-        `${this.configs.name} Bath`,
+        `${this.configs.name} Bath Auto`,
         PLATFORM_NAME,
         [this.accessory],
       )
@@ -60,9 +54,7 @@ export class WaterHeaterAccessory {
         if (!value || value.length === 0) {
           continue
         } else if (key === 'e3') {
-          this.autoState.power = value === '41' ? Power.ON : Power.OFF
-        } else if (key === 'e4') {
-          this.reheatingState.power = value === '41' ? Power.ON : Power.OFF
+          this.state.switch = value === '41' ? Switch.Active : Switch.Inactive
         }
       }
     })
@@ -74,38 +66,25 @@ export class WaterHeaterAccessory {
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.SerialNumber, FIXED_ID)
 
-    this.autoService =
+    this.service =
       this.accessory.getService(this.platform.Service.Faucet) ||
       this.accessory.addService(this.platform.Service.Faucet)
 
-    this.autoService.setCharacteristic(
+    this.service.setCharacteristic(
       this.platform.Characteristic.Name,
       `${this.configs.name} Bath Auto`,
     )
 
-    this.autoService
-      .getCharacteristic(this.platform.Characteristic.On)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.Active)
       .onSet(async (value) => {
-        this.autoState.power = value ? Power.ON : Power.OFF
+        this.state.switch = value ? Switch.Active : Switch.Inactive
         sendSet(this.configs.ip, ECHONET_LITE_ID, 0xe3, value ? 0x41 : 0x42)
       })
-      .onGet(() => this.autoState.power === Power.ON)
+      .onGet(() => this.state.switch === Switch.Active)
 
-    this.reheatingService =
-      this.accessory.getService(this.platform.Service.Faucet) ||
-      this.accessory.addService(this.platform.Service.Faucet)
-
-    this.reheatingService.setCharacteristic(
-      this.platform.Characteristic.Name,
-      `${this.configs.name} Bath Reheating`,
-    )
-
-    this.reheatingService
-      .getCharacteristic(this.platform.Characteristic.On)
-      .onSet(async (value) => {
-        this.reheatingState.power = value ? Power.ON : Power.OFF
-        sendSet(this.configs.ip, ECHONET_LITE_ID, 0xe4, value ? 0x41 : 0x42)
-      })
-      .onGet(() => this.reheatingState.power === Power.ON)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.InUse)
+      .onGet(() => this.state.switch === Switch.Active)
   }
 }
