@@ -1,10 +1,10 @@
 {
-  "name": "homebridge-qb-house-ir",
-  "displayName": "QB House IR",
+  "name": "homebridge-echonet-lite-waterheater",
+  "displayName": "Echonet Lite Water Heater",
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "description": "QB House IR",
+  "description": "Echonet Lite Water Heater",
   "author": "Jason Lee",
   "license": "Apache-2.0",
   "homepage": "https://github.com/USERNAME/GITHUB_PROJECT_NAME#readme",
@@ -49,5 +49,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.1"
+  },
+  "dependencies": {
+    "date-utils": "^1.2.21",
+    "echonet-lite": "^2.16.1"
   }
 }

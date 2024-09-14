@@ -1,12 +1,13 @@
-# homebridge-qb-house-ir
+# homebridge-echonet-lite-waterheater
 
 ## Usage
 
 ```js
 "platforms": [
   {
-    "platform": "QBHouseIR",
-    "name": "My light name"
+    "platform": "EchonetLiteWaterHeater",
+    "ip": "192.168.11.50",
+    "name": "Osaka Gas"
   }
 ]
 ```

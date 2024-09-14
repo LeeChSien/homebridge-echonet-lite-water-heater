@@ -8,11 +8,10 @@ import type {
   Service,
 } from 'homebridge'
 
-import { IRLightAccessory } from './IRLightAccessory.js'
-import { IRFanAccessory } from './IRFanAccessory.js'
-import { IRAmpAccessory } from './IRAmpAccessory.js'
+import { WaterHeaterAccessory } from './WaterHeaterAccessory.js'
+import { FloorHeaterAccessory } from './FlooerHeaterAccessory'
 
-export class IRPlatform implements DynamicPlatformPlugin {
+export class EchonetLitePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service
   public readonly Characteristic: typeof Characteristic
 
@@ -40,25 +39,18 @@ export class IRPlatform implements DynamicPlatformPlugin {
   }
 
   async discoverDevices() {
-    const lightAccessory = new IRLightAccessory(this, this.config)
+    const waterHeaterAccessory = new WaterHeaterAccessory(this, this.config)
     try {
-      await lightAccessory.init()
+      await waterHeaterAccessory.init()
     } catch (e) {
-      this.log.error('Cannot init ir light')
+      this.log.error('Cannot init water heater')
     }
 
-    const fanAccessory = new IRFanAccessory(this, this.config)
+    const flooerHeaterAccessory = new FloorHeaterAccessory(this, this.config)
     try {
-      await fanAccessory.init()
+      await flooerHeaterAccessory.init()
     } catch (e) {
-      this.log.error('Cannot init ir fan')
-    }
-
-    const ampAccessory = new IRAmpAccessory(this, this.config)
-    try {
-      await ampAccessory.init()
-    } catch (e) {
-      this.log.error('Cannot init ir amp')
+      this.log.error('Cannot init water heater')
     }
   }
 }
