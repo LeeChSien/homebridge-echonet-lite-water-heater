@@ -9,7 +9,7 @@ import type {
 } from 'homebridge'
 
 import { WaterHeaterAccessory } from './WaterHeaterAccessory.js'
-import { FloorHeaterAccessory } from './FlooerHeaterAccessory'
+import { FloorHeaterAccessory } from './FlooerHeaterAccessory.js'
 
 export class EchonetLitePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service
