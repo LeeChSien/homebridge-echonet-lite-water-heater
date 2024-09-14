@@ -41,7 +41,7 @@ export class BathReheatingAccessory {
       )
       this.accessory.context.device = this.configs
       this.platform.api.registerPlatformAccessories(
-        `${this.configs.name} Bath Auto`,
+        `${this.configs.name} Bath Reheating`,
         PLATFORM_NAME,
         [this.accessory],
       )
@@ -72,7 +72,7 @@ export class BathReheatingAccessory {
 
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.configs.name} Bath Auto`,
+      `${this.configs.name} Bath Reheating`,
     )
 
     this.service

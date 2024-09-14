@@ -41,7 +41,7 @@ export class FloorHeater2Accessory {
       )
       this.accessory.context.device = this.configs
       this.platform.api.registerPlatformAccessories(
-        `${this.configs.name} Floor Heater`,
+        `${this.configs.name} Floor Heater 2`,
         PLATFORM_NAME,
         [this.accessory],
       )
