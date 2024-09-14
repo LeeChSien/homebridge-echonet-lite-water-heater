@@ -18,6 +18,8 @@ export class FloorHeater2Accessory {
   private state = {
     power: Power.OFF as Power,
   }
+  // some mutual exclusive issue here, so we need to set this flag.
+  private isInitialized = false
 
   constructor(
     private readonly platform: EchonetLitePlatform,
@@ -53,8 +55,9 @@ export class FloorHeater2Accessory {
         const value = DETAILs[key]
         if (!value || value.length === 0) {
           continue
-        } else if (key === '80') {
+        } else if (key === '80' && !this.isInitialized) {
           this.state.power = value === '30' ? Power.ON : Power.OFF
+          this.isInitialized = true
         }
       }
     })

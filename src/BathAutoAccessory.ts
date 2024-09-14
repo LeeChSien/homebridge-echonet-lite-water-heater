@@ -55,12 +55,16 @@ export class BathAutoAccessory {
           continue
         } else if (key === 'e3') {
           this.state.switch = value === '41' ? Switch.Active : Switch.Inactive
+
+          this.service
+            .getCharacteristic(this.platform.Characteristic.Active)
+            .updateValue(this.state.switch === Switch.Active)
+          this.service
+            .getCharacteristic(this.platform.Characteristic.InUse)
+            .updateValue(this.state.switch === Switch.Active)
         }
       }
     })
-
-    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe3)
-    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe4)
 
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -75,6 +79,11 @@ export class BathAutoAccessory {
       `${this.configs.name} Bath Auto`,
     )
 
+    this.service.setCharacteristic(
+      this.platform.Characteristic.ValveType,
+      this.platform.Characteristic.ValveType.WATER_FAUCET,
+    )
+
     this.service
       .getCharacteristic(this.platform.Characteristic.Active)
       .onSet(async (value) => {
@@ -86,5 +95,8 @@ export class BathAutoAccessory {
     this.service
       .getCharacteristic(this.platform.Characteristic.InUse)
       .onGet(() => this.state.switch === Switch.Active)
+
+    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe3)
+    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe4)
   }
 }
