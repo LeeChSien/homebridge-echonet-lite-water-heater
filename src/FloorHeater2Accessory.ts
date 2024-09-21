@@ -97,6 +97,11 @@ export class FloorHeater2Accessory {
             this.platform.Characteristic.CurrentTemperature,
             0,
           )
+        } else {
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            this.state.level,
+          )
         }
       })
       .onGet(() => this.state.power === Power.ON)
@@ -154,6 +159,10 @@ export class FloorHeater2Accessory {
             ECHONET_LITE_DEVICE_ID,
             0xe1,
             eval(`0x${30 + newLevel}`),
+          )
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            this.state.level,
           )
         }
       })

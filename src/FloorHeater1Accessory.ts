@@ -91,6 +91,18 @@ export class FloorHeater1Accessory {
           POWER_STATE_EPC,
           value ? POWER_STATE_ON : POWER_STATE_OFF,
         )
+
+        if (this.state.power === Power.OFF) {
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            0,
+          )
+        } else {
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            this.state.level,
+          )
+        }
       })
       .onGet(() => this.state.power === Power.ON)
 
