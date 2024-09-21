@@ -91,12 +91,8 @@ export class BathAutoAccessory {
       .onGet(() => this.state.switch === Switch.ACTIVE)
 
     this.service
-      .getCharacteristic(this.platform.Characteristic.StatusFault)
-      .onGet(() =>
-        this.state.switch === Switch.ACTIVE
-          ? this.platform.Characteristic.StatusFault.GENERAL_FAULT
-          : this.platform.Characteristic.StatusFault.NO_FAULT,
-      )
+      .getCharacteristic(this.platform.Characteristic.InUse)
+      .onGet(() => this.state.switch === Switch.ACTIVE)
 
     sendGet(this.configs.ip, ECHONET_LITE_DEVICE_ID, POWER_STATE_EPC)
   }

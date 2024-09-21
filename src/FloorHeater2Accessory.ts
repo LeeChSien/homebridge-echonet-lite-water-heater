@@ -2,15 +2,16 @@ import type { PlatformAccessory, Service, PlatformConfig } from 'homebridge'
 
 import type { EchonetLitePlatform } from './EchonetLitePlatform.js'
 import { sendSet, sendGet, subscribe } from './EchonetLiteService.js'
-import { PLATFORM_NAME } from './settings.js'
+import { PLATFORM_NAME, FLOOR_HEATER_2_FIXED_ID } from './settings.js'
 import { Power } from './types.js'
 
+const ECHONET_LITE_DEVICE_ID = '027b02'
 const POWER_STATE_EPC = 0x80
 const POWER_STATE_ON = 0x30
 const POWER_STATE_OFF = 0x31
 const LEVEL_EPC = 0xe1
 
-export class FloorHeaterAccessory {
+export class FloorHeater2Accessory {
   public accessory!: PlatformAccessory
   private service!: Service
   private state = {
@@ -22,15 +23,14 @@ export class FloorHeaterAccessory {
 
   constructor(
     private readonly platform: EchonetLitePlatform,
-    private readonly ECHONET_LITE_DEVICE_ID: string,
     private readonly configs: PlatformConfig,
   ) {
     // don nothing.
   }
 
   async init() {
-    const name = `${this.configs.name} Floor Heater 1`
-    const uuid = this.platform.api.hap.uuid.generate(name)
+    const name = `${this.configs.name} Floor Heater 2`
+    const uuid = this.platform.api.hap.uuid.generate(FLOOR_HEATER_2_FIXED_ID)
 
     const existingAccessory = this.platform.accessories.find(
       (accessory) => accessory.UUID === uuid,
@@ -39,17 +39,14 @@ export class FloorHeaterAccessory {
     if (existingAccessory) {
       this.accessory = existingAccessory
     } else {
-      this.accessory = new this.platform.api.platformAccessory(
-        this.configs.name as string,
-        uuid,
-      )
+      this.accessory = new this.platform.api.platformAccessory(name, uuid)
       this.accessory.context.device = this.configs
       this.platform.api.registerPlatformAccessories(name, PLATFORM_NAME, [
         this.accessory,
       ])
     }
 
-    subscribe(this.configs.ip, this.ECHONET_LITE_DEVICE_ID, (els) => {
+    subscribe(this.configs.ip, ECHONET_LITE_DEVICE_ID, (els) => {
       const { DETAILs } = els
       for (const key in DETAILs) {
         const value = DETAILs[key]
@@ -68,14 +65,14 @@ export class FloorHeaterAccessory {
       }
     })
 
-    sendGet(this.configs.ip, this.ECHONET_LITE_DEVICE_ID, POWER_STATE_EPC)
-    sendGet(this.configs.ip, this.ECHONET_LITE_DEVICE_ID, LEVEL_EPC)
+    sendGet(this.configs.ip, ECHONET_LITE_DEVICE_ID, POWER_STATE_EPC)
+    sendGet(this.configs.ip, ECHONET_LITE_DEVICE_ID, LEVEL_EPC)
 
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(
         this.platform.Characteristic.SerialNumber,
-        this.ECHONET_LITE_DEVICE_ID,
+        FLOOR_HEATER_2_FIXED_ID,
       )
 
     this.service =
@@ -90,7 +87,7 @@ export class FloorHeaterAccessory {
         this.state.power = value ? Power.ON : Power.OFF
         sendSet(
           this.configs.ip,
-          this.ECHONET_LITE_DEVICE_ID,
+          ECHONET_LITE_DEVICE_ID,
           POWER_STATE_EPC,
           value ? POWER_STATE_ON : POWER_STATE_OFF,
         )
@@ -140,7 +137,7 @@ export class FloorHeaterAccessory {
           this.state.level = newLevel
           sendSet(
             this.configs.ip,
-            this.ECHONET_LITE_DEVICE_ID,
+            ECHONET_LITE_DEVICE_ID,
             0xe1,
             eval(`0x${30 + newLevel}}`),
           )

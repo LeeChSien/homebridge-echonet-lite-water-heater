@@ -35,10 +35,7 @@ export class BathReheatingAccessory {
     if (existingAccessory) {
       this.accessory = existingAccessory
     } else {
-      this.accessory = new this.platform.api.platformAccessory(
-        this.configs.name as string,
-        uuid,
-      )
+      this.accessory = new this.platform.api.platformAccessory(name, uuid)
       this.accessory.context.device = this.configs
       this.platform.api.registerPlatformAccessories(name, PLATFORM_NAME, [
         this.accessory,
@@ -94,12 +91,8 @@ export class BathReheatingAccessory {
       .onGet(() => this.state.switch === Switch.ACTIVE)
 
     this.service
-      .getCharacteristic(this.platform.Characteristic.StatusFault)
-      .onGet(() =>
-        this.state.switch === Switch.ACTIVE
-          ? this.platform.Characteristic.StatusFault.GENERAL_FAULT
-          : this.platform.Characteristic.StatusFault.NO_FAULT,
-      )
+      .getCharacteristic(this.platform.Characteristic.InUse)
+      .onGet(() => this.state.switch === Switch.ACTIVE)
 
     sendGet(this.configs.ip, ECHONET_LITE_DEVICE_ID, POWER_STATE_EPC)
   }
