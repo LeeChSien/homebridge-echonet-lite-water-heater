@@ -60,7 +60,7 @@ export class FloorHeater1Accessory {
             value === POWER_STATE_ON.toString(16) ? Power.ON : Power.OFF
           this.isInitialized = true
         } else if (key === LEVEL_EPC.toString(16)) {
-          this.state.level = parseInt(value, 16) - 30
+          this.state.level = Number(value) - 30
         }
       }
     })
@@ -141,7 +141,7 @@ export class FloorHeater1Accessory {
             this.configs.ip,
             ECHONET_LITE_DEVICE_ID,
             0xe1,
-            eval(`0x${30 + newLevel}}`),
+            eval(`0x${30 + newLevel}`),
           )
         }
       })
