@@ -125,7 +125,9 @@ export class FloorHeater2Accessory {
       .onGet(() => 20) // TODO: attach real temperature later
 
     this.service
-      .getCharacteristic(this.platform.Characteristic.TargetTemperature)
+      .getCharacteristic(
+        this.platform.Characteristic.HeatingThresholdTemperature,
+      )
       .setProps({
         minValue: 20,
         maxValue: 28,
