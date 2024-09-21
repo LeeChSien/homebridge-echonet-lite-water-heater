@@ -122,19 +122,19 @@ export class FloorHeater2Accessory {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .onGet(() => 20) // TODO: attach real temperature later
+      .onGet(() => '--') // TODO: attach real temperature later
 
     this.service
       .getCharacteristic(
         this.platform.Characteristic.HeatingThresholdTemperature,
       )
       .setProps({
-        minValue: 20,
-        maxValue: 28,
+        minValue: 21,
+        maxValue: 29,
         minStep: 1,
       })
       .onSet(async (value) => {
-        const newLevel = (value as number) - 19
+        const newLevel = (value as number) - 20
         if (this.state.level !== newLevel) {
           this.state.level = newLevel
           sendSet(
@@ -145,6 +145,6 @@ export class FloorHeater2Accessory {
           )
         }
       })
-      .onGet(() => this.state.level + 19)
+      .onGet(() => this.state.level + 20)
   }
 }
