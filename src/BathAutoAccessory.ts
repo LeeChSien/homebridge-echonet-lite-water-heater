@@ -1,9 +1,8 @@
 import type { PlatformAccessory, Service, PlatformConfig } from 'homebridge'
-import { Categories } from 'homebridge'
 
 import type { EchonetLitePlatform } from './EchonetLitePlatform.js'
 import { sendSet, sendGet, subscribe } from './EchonetLiteService.js'
-import { BATH_AUTO_FIXED_ID } from './settings.js'
+import { PLATFORM_NAME, BATH_AUTO_FIXED_ID } from './settings.js'
 import { Switch } from './types.js'
 
 const ECHONET_LITE_DEVICE_ID = '027201'
@@ -37,12 +36,10 @@ export class BathAutoAccessory {
       this.accessory = existingAccessory
     } else {
       this.accessory = new this.platform.api.platformAccessory(name, uuid)
-
-      this.accessory.displayName = name
-      this.accessory.category = Categories.FAUCET
-
       this.accessory.context.device = this.configs
-      this.platform.api.publishExternalAccessories(name, [this.accessory])
+      this.platform.api.registerPlatformAccessories(name, PLATFORM_NAME, [
+        this.accessory,
+      ])
     }
 
     subscribe(this.configs.ip, ECHONET_LITE_DEVICE_ID, (els) => {
