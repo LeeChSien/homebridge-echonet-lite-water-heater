@@ -2,7 +2,7 @@ import type { PlatformAccessory, Service, PlatformConfig } from 'homebridge'
 
 import type { EchonetLitePlatform } from './EchonetLitePlatform.js'
 import { sendSet, sendGet, subscribe } from './EchonetLiteService.js'
-import { PLATFORM_NAME, FLOOR_HEATER_1_FIXED_ID } from './settings.js'
+import { PLATFORM_NAME } from './settings.js'
 import { Power } from './types.js'
 
 const POWER_STATE_EPC = 0x80
@@ -30,7 +30,7 @@ export class FloorHeaterAccessory {
 
   async init() {
     const name = `${this.configs.name} Floor Heater 1`
-    const uuid = this.platform.api.hap.uuid.generate(FLOOR_HEATER_1_FIXED_ID)
+    const uuid = this.platform.api.hap.uuid.generate(name)
 
     const existingAccessory = this.platform.accessories.find(
       (accessory) => accessory.UUID === uuid,
@@ -75,7 +75,7 @@ export class FloorHeaterAccessory {
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(
         this.platform.Characteristic.SerialNumber,
-        FLOOR_HEATER_1_FIXED_ID,
+        this.ECHONET_LITE_DEVICE_ID,
       )
 
     this.service =

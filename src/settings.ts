@@ -11,7 +11,3 @@ export const PLUGIN_NAME = 'echonet-lite-water-heater'
 export const BATH_AUTO_FIXED_ID = 'echonet-lite:bath-auto'
 
 export const BATH_REHEATING_FIXED_ID = 'echonet-lite:bath-reheating'
-
-export const FLOOR_HEATER_1_FIXED_ID = 'echonet-lite:floor-heater-1'
-
-export const FLOOR_HEATER_2_FIXED_ID = 'echonet-lite:floor-heater-2'
