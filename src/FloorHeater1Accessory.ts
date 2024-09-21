@@ -122,7 +122,12 @@ export class FloorHeater1Accessory {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .onGet(() => '--') // TODO: attach real temperature later
+      .onGet(() => {
+        if (this.state.power === Power.ON) {
+          return this.state.level
+        }
+        return 0
+      })
 
     this.service
       .getCharacteristic(
