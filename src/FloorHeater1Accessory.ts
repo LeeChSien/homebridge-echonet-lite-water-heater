@@ -25,7 +25,7 @@ export class FloorHeater1Accessory {
     private readonly platform: EchonetLitePlatform,
     private readonly configs: PlatformConfig,
   ) {
-    // don nothing.
+    // do nothing
   }
 
   async init() {
@@ -147,6 +147,10 @@ export class FloorHeater1Accessory {
             ECHONET_LITE_DEVICE_ID,
             0xe1,
             eval(`0x${30 + newLevel}`),
+          )
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            this.state.level,
           )
         }
       })

@@ -25,7 +25,7 @@ export class FloorHeater2Accessory {
     private readonly platform: EchonetLitePlatform,
     private readonly configs: PlatformConfig,
   ) {
-    // don nothing.
+    // do nothing
   }
 
   async init() {
@@ -91,6 +91,13 @@ export class FloorHeater2Accessory {
           POWER_STATE_EPC,
           value ? POWER_STATE_ON : POWER_STATE_OFF,
         )
+
+        if (this.state.power === Power.OFF) {
+          this.service.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            0,
+          )
+        }
       })
       .onGet(() => this.state.power === Power.ON)
 
