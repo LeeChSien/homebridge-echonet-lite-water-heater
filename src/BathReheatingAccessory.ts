@@ -2,32 +2,32 @@ import type { PlatformAccessory, Service, PlatformConfig } from 'homebridge'
 
 import type { EchonetLitePlatform } from './EchonetLitePlatform.js'
 import { sendSet, sendGet, subscribe } from './EchonetLiteService.js'
-import { PLATFORM_NAME } from './settings.js'
+import { PLATFORM_NAME, BATH_REHEATING_FIXED_ID } from './settings.js'
+import { Switch } from './types.js'
 
-enum Switch {
-  Active = 'Active',
-  Inactive = 'Inactive',
-}
-
-const FIXED_ID = 'fixed:echonet-lite:bath-reheating'
-const ECHONET_LITE_ID = '027201'
+const ECHONET_LITE_DEVICE_ID = '027201'
+const POWER_STATE_EPC = 0xe4
+const POWER_STATE_ON = 0x41
+const POWER_STATE_OFF = 0x42
 
 export class BathReheatingAccessory {
   public accessory!: PlatformAccessory
   private service!: Service
   private state = {
-    switch: Switch.Active as Switch,
+    switch: Switch.ACTIVE as Switch,
   }
 
   constructor(
     private readonly platform: EchonetLitePlatform,
     private readonly configs: PlatformConfig,
   ) {
-    // don nothing.
+    // do nothing
   }
 
   async init() {
-    const uuid = this.platform.api.hap.uuid.generate(FIXED_ID)
+    const name = `${this.configs.name} Bath Reheating`
+    const uuid = this.platform.api.hap.uuid.generate(BATH_REHEATING_FIXED_ID)
+
     const existingAccessory = this.platform.accessories.find(
       (accessory) => accessory.UUID === uuid,
     )
@@ -40,63 +40,67 @@ export class BathReheatingAccessory {
         uuid,
       )
       this.accessory.context.device = this.configs
-      this.platform.api.registerPlatformAccessories(
-        `${this.configs.name} Bath Reheating`,
-        PLATFORM_NAME,
-        [this.accessory],
-      )
+      this.platform.api.registerPlatformAccessories(name, PLATFORM_NAME, [
+        this.accessory,
+      ])
     }
 
-    subscribe(this.configs.ip, ECHONET_LITE_ID, (els) => {
+    subscribe(this.configs.ip, ECHONET_LITE_DEVICE_ID, (els) => {
       const { DETAILs } = els
       for (const key in DETAILs) {
         const value = DETAILs[key]
         if (!value || value.length === 0) {
           continue
-        } else if (key === 'e4') {
-          this.state.switch = value === '41' ? Switch.Active : Switch.Inactive
+        } else if (key === POWER_STATE_EPC.toString(16)) {
+          this.state.switch =
+            value === POWER_STATE_EPC.toString(16)
+              ? Switch.ACTIVE
+              : Switch.INACTIVE
 
           this.service
             .getCharacteristic(this.platform.Characteristic.Active)
-            .updateValue(this.state.switch === Switch.Active)
+            .updateValue(this.state.switch === Switch.ACTIVE)
           this.service
             .getCharacteristic(this.platform.Characteristic.InUse)
-            .updateValue(this.state.switch === Switch.Active)
+            .updateValue(this.state.switch === Switch.ACTIVE)
         }
       }
     })
 
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, FIXED_ID)
+      .setCharacteristic(
+        this.platform.Characteristic.SerialNumber,
+        BATH_REHEATING_FIXED_ID,
+      )
 
     this.service =
       this.accessory.getService(this.platform.Service.Faucet) ||
       this.accessory.addService(this.platform.Service.Faucet)
 
-    this.service.setCharacteristic(
-      this.platform.Characteristic.Name,
-      `${this.configs.name} Bath Reheating`,
-    )
-
-    this.service.setCharacteristic(
-      this.platform.Characteristic.ValveType,
-      this.platform.Characteristic.ValveType.WATER_FAUCET,
-    )
+    this.service.setCharacteristic(this.platform.Characteristic.Name, name)
 
     this.service
       .getCharacteristic(this.platform.Characteristic.Active)
       .onSet(async (value) => {
-        this.state.switch = value ? Switch.Active : Switch.Inactive
-        sendSet(this.configs.ip, ECHONET_LITE_ID, 0xe4, value ? 0x41 : 0x42)
+        this.state.switch = value ? Switch.ACTIVE : Switch.INACTIVE
+        sendSet(
+          this.configs.ip,
+          ECHONET_LITE_DEVICE_ID,
+          POWER_STATE_EPC,
+          value ? POWER_STATE_ON : POWER_STATE_OFF,
+        )
       })
-      .onGet(() => this.state.switch === Switch.Active)
+      .onGet(() => this.state.switch === Switch.ACTIVE)
 
     this.service
-      .getCharacteristic(this.platform.Characteristic.InUse)
-      .onGet(() => this.state.switch === Switch.Active)
+      .getCharacteristic(this.platform.Characteristic.StatusFault)
+      .onGet(() =>
+        this.state.switch === Switch.ACTIVE
+          ? this.platform.Characteristic.StatusFault.GENERAL_FAULT
+          : this.platform.Characteristic.StatusFault.NO_FAULT,
+      )
 
-    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe3)
-    sendGet(this.configs.ip, ECHONET_LITE_ID, 0xe4)
+    sendGet(this.configs.ip, ECHONET_LITE_DEVICE_ID, POWER_STATE_EPC)
   }
 }

@@ -10,8 +10,7 @@ import type {
 
 import { BathAutoAccessory } from './BathAutoAccessory.js'
 import { BathReheatingAccessory } from './BathReheatingAccessory.js'
-import { FloorHeater1Accessory } from './FlooerHeater1Accessory.js'
-import { FloorHeater2Accessory } from './FlooerHeater2Accessory.js'
+import { FloorHeaterAccessory } from './FloorHeaterAccessory.js'
 
 export class EchonetLitePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service
@@ -55,16 +54,26 @@ export class EchonetLitePlatform implements DynamicPlatformPlugin {
       this.log.error('Cannot init bath reheating')
     }
 
-    const flooerHeater1Accessory = new FloorHeater1Accessory(this, this.config)
+    const HEATER_1_ECHONET_LITE_DEVICE_ID = '027b01'
+    const floorHeater1Accessory = new FloorHeaterAccessory(
+      this,
+      HEATER_1_ECHONET_LITE_DEVICE_ID,
+      this.config,
+    )
     try {
-      await flooerHeater1Accessory.init()
+      await floorHeater1Accessory.init()
     } catch (e) {
       this.log.error('Cannot init floor heater 1')
     }
 
-    const flooerHeater2Accessory = new FloorHeater2Accessory(this, this.config)
+    const HEATER_2_ECHONET_LITE_DEVICE_ID = '027b02'
+    const floorHeater2Accessory = new FloorHeaterAccessory(
+      this,
+      HEATER_2_ECHONET_LITE_DEVICE_ID,
+      this.config,
+    )
     try {
-      await flooerHeater2Accessory.init()
+      await floorHeater2Accessory.init()
     } catch (e) {
       this.log.error('Cannot init floor heater 2')
     }
